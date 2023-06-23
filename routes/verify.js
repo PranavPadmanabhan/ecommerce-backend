@@ -6,6 +6,6 @@ const router = Router()
 
 
 router.get("/requestVerification/:phone",RequestVerification)
-router.get("/verify/:phone",Verify)
+router.get("/verify",Verify)
 
 module.exports = router
