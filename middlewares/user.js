@@ -1,6 +1,7 @@
 const User = require('../models/User.js')
 const bcrypt = require('bcrypt')
 const { v4: uuidv4 } = require('uuid');
+const Cart = require('../models/Cart.js');
 const saltRounds = 10;
 
 module.exports.SignUp = async (req, res, next) => {
@@ -25,6 +26,12 @@ module.exports.SignUp = async (req, res, next) => {
                                 password: hash,
                                 addresses: [],
                                 VerifiedUser: false
+                            }).save()
+                            const cart = await new Cart({
+                                cartId:uuidv4(),
+                                phone,
+                                products:[],
+                                userId:newUser.userId
                             }).save()
                             res.status(201).json({ message: "signup successful ", user: await User.findOne({ phone }).select([
                                 "userId",

@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const saltRounds = 10;
 require("dotenv").config()
 const { v4: uuidv4 } = require('uuid');
+const Cart = require('../models/Cart.js');
 const admins = JSON.parse(process.env.DATA).admins
 
 module.exports.SignUp = async (req, res, next) => {
@@ -30,7 +31,12 @@ module.exports.SignUp = async (req, res, next) => {
                                 addresses: [],
                                 VerifiedUser: false
                             }).save()
-                            
+                            const cart = await new Cart({
+                                cartId:uuidv4(),
+                                phone,
+                                products:[],
+                                userId:newUser.userId
+                            }).save()
                             res.status(201).json({ message: "signup successful ", user: newUser })
                         }
                     });
