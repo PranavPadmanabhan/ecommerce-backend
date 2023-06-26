@@ -20,19 +20,26 @@ module.exports.GetCart = async (req, res) => {
 
 module.exports.AddToCart = async (req, res) => {
     try {
-        const { productId, phone, color,size } = req.body;
-        if (productId && phone && color&&size) {
+        const { productId, phone, color, size, quantity } = req.body;
+        if (productId && phone && color && size) {
             const prod = await Product.findOne({ productId })
             const cart = await Cart.findOne({ phone })
             if (prod && cart) {
                 const filtered = cart.products.filter((item) => (item.productId === productId && item.color === color && item.size === size))
-                if (filtered.length > 1) {
-                    cart.products = cart.products.map(item => item.productId === productId ? { ...item, quantity: filtered.length + 1 } : item);
+                if (filtered.length > 0) {
+                    cart.products = cart.products.map(item => (item.productId === productId && item.color === color && item.size === size)? { ...item, quantity: filtered.length + 1 } : item);
                     const updated = await cart.save()
                     res.status(201).json({ cart: updated })
                 }
                 else {
-                    cart.products = [...cart.products, { ...prod, quantity: 1, color,size }]
+                    cart.products = [...cart.products, {
+                        cartItemId:uuidv4(),
+                        productId: productId,
+                        color,
+                        product: prod,
+                        quantity,
+                        size
+                    }]
                     const updated = await cart.save()
                     res.status(201).json({ cart: updated })
                 }
@@ -51,19 +58,19 @@ module.exports.AddToCart = async (req, res) => {
 
 module.exports.RemoveQuantityFromCart = async (req, res) => {
     try {
-        const { productId, phone } = req.body;
+        const { productId,cartItemId, phone, color, size, quantity } = req.body;
         if (productId && phone) {
             const prod = await Product.findOne({ productId })
             const cart = await Cart.findOne({ phone })
             if (prod && cart) {
-                const filtered = cart.products.filter((item) => item.productId === productId)
-                if (filtered.length > 1) {
-                    cart.products = cart.products.map(item => item.productId === productId ? { ...item, quantity: filtered.length - 1 } : item);
+                const filtered = cart.products.filter((item) => item.cartItemId === cartItemId)
+                if (filtered.length > 0 && quantity > 0) {
+                    cart.products = cart.products.map(item => item.cartItemId === cartItemId ? { ...item, quantity } : item);
                     const updated = await cart.save()
                     res.status(201).json({ cart: updated })
                 }
-                else {
-                    cart.products = cart.products.filter(item => item.productId !== productId)
+                else if (quantity == 0) {
+                    cart.products = cart.products.filter(item => item.cartItemId !== cartItemId)
                     const updated = await cart.save()
                     res.status(201).json({ cart: updated })
                 }
@@ -83,13 +90,13 @@ module.exports.RemoveQuantityFromCart = async (req, res) => {
 
 module.exports.RemoveProductFromCart = async (req, res) => {
     try {
-        const { productId, phone } = req.body;
+        const { cartItemId,productId, phone } = req.body;
         if (productId && phone) {
             const prod = await Product.findOne({ productId })
             const cart = await Cart.findOne({ phone })
             if (prod && cart) {
 
-                cart.products = cart.products.filter(item => item.productId !== productId)
+                cart.products = cart.products.filter(item => item.cartItemId !== cartItemId)
                 const updated = await cart.save()
                 res.status(201).json({ cart: updated })
             }
@@ -111,7 +118,7 @@ module.exports.AddCustomProductToCart = async (req, res) => {
         if (color && designs) {
             const cart = await Cart.findOne({ phone })
             cart.products = [...cart.products, {
-                productId:uuidv4(),
+                productId: uuidv4(),
                 designs,
                 name: "Customized Product",
                 images: images ?? null,
@@ -119,7 +126,7 @@ module.exports.AddCustomProductToCart = async (req, res) => {
                 size,
             }]
             const updated = await cart.save()
-            res.status(200).json({cart:updated})
+            res.status(200).json({ cart: updated })
         }
         else {
             res.status(200).json({ error: 'Fields are missing!' })
