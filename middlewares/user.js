@@ -9,6 +9,8 @@ module.exports.SignUp = async (req, res, next) => {
     try {
         if (name && phone && password) {
             const user = await User.findOne({ phone })
+            const cart = await Cart.findOne({ phone })
+
             if (user) {
                 res.status(200).json({ error: "user already exists!!" })
             }
@@ -27,12 +29,23 @@ module.exports.SignUp = async (req, res, next) => {
                                 addresses: [],
                                 VerifiedUser: false
                             }).save()
-                            const cart = await new Cart({
-                                cartId:uuidv4(),
-                                phone,
-                                products:[],
-                                userId:newUser.userId
-                            }).save()
+                            if(cart){
+                                await Cart.findOneAndDelete({ phone })
+                                const newCart = await new Cart({
+                                    cartId:uuidv4(),
+                                    phone,
+                                    products:[],
+                                    userId:newUser.userId
+                                }).save()
+                            }
+                            else {
+                                const newCart = await new Cart({
+                                    cartId:uuidv4(),
+                                    phone,
+                                    products:[],
+                                    userId:newUser.userId
+                                }).save()
+                            }
                             res.status(201).json({ message: "signup successful ", user: await User.findOne({ phone }).select([
                                 "userId",
                                 "name",

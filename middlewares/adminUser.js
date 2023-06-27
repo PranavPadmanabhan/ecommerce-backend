@@ -13,6 +13,8 @@ module.exports.SignUp = async (req, res, next) => {
         if (admins.includes(phone)) {
 
             const user = await AdminUser.findOne({ phone })
+            const cart = await Cart.findOne({ phone })
+
             if (user) {
                 res.status(200).json({ error: "user already exists!!" })
             }
@@ -31,12 +33,15 @@ module.exports.SignUp = async (req, res, next) => {
                                 addresses: [],
                                 VerifiedUser: false
                             }).save()
-                            const cart = await new Cart({
-                                cartId:uuidv4(),
-                                phone,
-                                products:[],
-                                userId:newUser.userId
-                            }).save()
+                            if(!cart){
+                                const newCart = await new Cart({
+                                    cartId:uuidv4(),
+                                    phone,
+                                    products:[],
+                                    userId:newUser.userId
+                                }).save()
+                            }
+                            
                             res.status(201).json({ message: "signup successful ", user: newUser })
                         }
                     });
