@@ -20,7 +20,7 @@ const PORT = process.env.PORT
 mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connection successful..`)).catch(err => console.log(err))
 
 app.use(cors({
-    origin:"*"
+    origin:["http://localhost:5000","https://inline-outfits.vercel.app"]
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
