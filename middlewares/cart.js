@@ -25,24 +25,24 @@ module.exports.AddToCart = async (req, res) => {
             const prod = await Product.findOne({ productId })
             const cart = await Cart.findOne({ phone })
             if (prod && cart) {
-                const filtered = cart.products.filter((item) => (item.productId === productId && item.color === color && item.size === size))
-                console.log(filtered)
+                const filtered = cart.products.filter((item) => (item.productId === productId && item.color.code == color.code && item.size === size))
                 if (filtered.length > 0) {
-                    cart.products = cart.products.map(item => (item.productId === productId && item.color === color && item.size === size)? { ...item, quantity: filtered.length + 1 } : item);
+                    cart.products = cart.products.map(item => (item.productId === productId && item.color.code == color.code && item.size === size)? { ...item, quantity: item.quantity + quantity } : item);
                     const updated = await cart.save()
-                    res.status(201).json({ cart: updated })
+                    res.status(201).json({ product: filtered[0] })
                 }
                 else {
-                    cart.products = [...cart.products, {
+                    const product = {
                         cartItemId:uuidv4(),
                         productId: productId,
                         color,
                         product: prod,
                         quantity,
                         size
-                    }]
+                    }
+                    cart.products = [...cart.products,product ]
                     const updated = await cart.save()
-                    res.status(201).json({ cart: updated })
+                    res.status(201).json({ product })
                 }
             }
             else {
