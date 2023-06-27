@@ -7,7 +7,18 @@ const userSchema = new Schema({
     phone:{ type: String, required:true, unique:true },
     password: { type: String },
     profileImage:String,
-    addresses:{ type: Array },
+    addresses:{ type: [{
+        name:String,
+        phone:String,
+        locality:String,
+        pinCode:String,
+        address:String,
+        city:String,
+        state:String,
+        landMark:String,
+        alternateNumber:String,
+        isHomeAddress:Boolean
+    }] },
     VerifiedUser:Boolean
 })
 

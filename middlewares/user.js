@@ -134,11 +134,32 @@ module.exports.UpdateUser = async (req, res, next) => {
             }
             else {
                 res.status(200).json({ error: "user doesnot exist!!" })
-    
             }
         }
         else {
             res.status(200).json({ error: "fields missing!!" })
+        }
+    } catch (error) {
+        
+    }
+}
+
+module.exports.GetUser = async(req,res) => {
+    try {
+        const { phone } = req.params;
+        const user = await User.findOne({ phone }).select([
+            "userId",
+            "name",
+            "email",
+            "phone",
+            "profileImage",
+            "VerifiedUser"
+        ])
+        if(user){
+            res.status(200).json(user)
+        }
+        else{
+            res.status(200).json({ error: "user not found!!"}) 
         }
     } catch (error) {
         
