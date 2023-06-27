@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connecti
 app.use(cors({
     origin: 'https://inline-outfits.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type'],
+    // allowedHeaders: ['Content-Type'],
   }));
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
