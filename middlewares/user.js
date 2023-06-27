@@ -113,7 +113,8 @@ module.exports.UpdateUser = async (req, res, next) => {
                 "email",
                 "phone",
                 "profileImage",
-                "VerifiedUser"
+                "VerifiedUser",
+                "addresses"
             ])
             if (user) {
     
@@ -129,6 +130,7 @@ module.exports.UpdateUser = async (req, res, next) => {
                                 user.password = hash ?? user.password
                                 user.VerifiedUser = isVerified ?? user.VerifiedUser
                                 user.profileImage = profileImage ?? user.profileImage
+                                user.addresses = addresses ?? user.addresses
                                 const updated = await user.save()
                                 res.status(200).json({ message: "updated successfully", user: updated })
                             }
@@ -140,6 +142,7 @@ module.exports.UpdateUser = async (req, res, next) => {
                     user.email = email ?? user.email
                     user.VerifiedUser = isVerified ?? user.VerifiedUser
                     user.profileImage = profileImage ?? user.profileImage
+                    user.addresses = addresses ?? user.addresses
                     const updated = await user.save()
                     res.status(200).json({ message: "updated successfully", user: updated })
                 }
@@ -166,7 +169,8 @@ module.exports.GetUser = async(req,res) => {
             "email",
             "phone",
             "profileImage",
-            "VerifiedUser"
+            "VerifiedUser",
+            "addresses"
         ])
         if(user){
             res.status(200).json(user)

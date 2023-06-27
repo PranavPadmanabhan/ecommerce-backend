@@ -19,11 +19,13 @@ const PORT = process.env.PORT
 
 mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connection successful..`)).catch(err => console.log(err))
 
-app.use(cors({
+app.use(cors(
+  {
     origin: process.env.ORIGIN,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     // allowedHeaders: ['Content-Type'],
-  }));
+  }
+  ));
 
   app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', process.env.ORIGIN);
