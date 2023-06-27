@@ -19,16 +19,15 @@ const PORT = process.env.PORT
 
 mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connection successful..`)).catch(err => console.log(err))
 
-app.use(cors())
+app.use(cors({
+    origin: 'https://inline-outfits.vercel.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type'],
+  }));
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(apiKeyMiddleware)
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://inline-outfits.vercel.app');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-  });
+
 
 app.use("/auth", userRoute)
 app.use("/admin", adminUserRoute)
