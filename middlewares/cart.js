@@ -26,6 +26,7 @@ module.exports.AddToCart = async (req, res) => {
             const cart = await Cart.findOne({ phone })
             if (prod && cart) {
                 const filtered = cart.products.filter((item) => (item.productId === productId && item.color === color && item.size === size))
+                console.log(filtered)
                 if (filtered.length > 0) {
                     cart.products = cart.products.map(item => (item.productId === productId && item.color === color && item.size === size)? { ...item, quantity: filtered.length + 1 } : item);
                     const updated = await cart.save()

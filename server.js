@@ -20,13 +20,13 @@ const PORT = process.env.PORT
 mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connection successful..`)).catch(err => console.log(err))
 
 app.use(cors({
-    origin: 'https://inline-outfits.vercel.app',
+    origin: process.env.ORIGIN,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     // allowedHeaders: ['Content-Type'],
   }));
 
   app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://inline-outfits.vercel.app');
+    res.setHeader('Access-Control-Allow-Origin', process.env.ORIGIN);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     next();
