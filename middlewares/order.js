@@ -17,28 +17,25 @@ function generateId(length) {
 }
 
 module.exports.PlaceOrder = async (req, res) => {
-    const { phone, products, quantity, address, color, size, price } = req.body;
+    const { phone, products, address, price } = req.body;
     try {
-        if (phone && products && quantity && address && color && size && price) {
+        if (phone && products && address && price) {
             
             if (products) {
                 const order = new Order({
                     orderId: generateId(16),
                     phone,
                     products,
-                    quantity,
-                    color,
-                    size,
                     totalPrice: price,
                     status: "Order Placed",
                     address,
                     deliveryDetails: {
-                        message: "delivered within 4 to 5 working days"
+                        message: "delivered within 10 working days"
                     }
 
                 }).save()
                 const orders = await Order.find({ phone })
-                res.status(201).json({ message: "Order Placed SuccessFully", orders })
+                res.status(201).json({ message: "Order Placed SuccessFully", orders,order })
             }
             else {
                 res.status(200).json({ error: "something went wrong!" })
@@ -163,23 +160,20 @@ module.exports.AdminOrders = async (req, res) => {
 
 module.exports.AddCustomOrder = async (req, res) => {
     try {
-        const { phone, address, quantity, details, designs, price, color, size } = req.body
-        if (phone && address && quantity && designs && price && color && size) {
+        const { phone, address, details, designs, price } = req.body
+        if (phone && address && designs && price) {
             const order = await new Order({
                 orderId: generateId(16),
                 phone,
                 address,
-                color,
-                size,
                 products: [{
                     ...details,
                     designs
                 }],
-                quantity,
                 totalPrice: price,
                 status: "Order Placed",
                 deliveryDetails: {
-                    message: "delivered within 4 to 5 working days"
+                    message: "delivered within 10 working days"
                 }
             }).save()
             res.status(201).json(order)

@@ -4,9 +4,6 @@ const orderSchema = new Schema({
     orderId:{ type:String, unique:true},
     phone:{ type: String, required:true, unique:true },
     products:{type:[Object]},
-    quantity:Number,
-    color:String,
-    size:String,
     totalPrice:String,
     address:{
         type:{
