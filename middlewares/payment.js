@@ -8,17 +8,16 @@ var instance = new Razorpay({ key_id: process.env.RAZOR_PAY_ID, key_secret: proc
 
 
 function generateId(length) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numbers = '1234567890'
     let result = '';
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-    // }
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  
     for (let i = 0; i < length; i++) {
-        result += numbers.charAt(Math.floor(Math.random() * characters.length));
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters.charAt(randomIndex);
     }
+  
     return result;
-}
+  }
 
 module.exports.InitiatePayment = async (req, res) => {
 
@@ -47,7 +46,7 @@ module.exports.Verify = async (req, res) => {
     if (expectedSignature === response.razorpay_signature) {
         if (orderType === "normal") {
             const order = new Order({
-                orderId: generateId(16),
+                orderId: generateId(32),
                 phone: order.phone,
                 products: order.products,
                 quantity: order.quantity,
@@ -69,7 +68,7 @@ module.exports.Verify = async (req, res) => {
         }
         else {
             const order = await new Order({
-                orderId: generateId(16),
+                orderId: generateId(32),
                 phone: order.phone,
                 address: order.address,
                 color: order.color,

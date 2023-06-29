@@ -3,18 +3,18 @@ const Product = require("../models/Product.js")
 require("dotenv").config()
 const admins = JSON.parse(process.env.DATA).admins
 
-function generateId(length) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numbers = '1234567890'
+function generateRandomString(length) {
     let result = '';
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-    // }
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  
     for (let i = 0; i < length; i++) {
-        result += numbers.charAt(Math.floor(Math.random() * characters.length));
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters.charAt(randomIndex);
     }
+  
     return result;
-}
+  }
+  
 
 module.exports.PlaceOrder = async (req, res) => {
     const { phone, products, address, price } = req.body;
@@ -23,7 +23,7 @@ module.exports.PlaceOrder = async (req, res) => {
             
             if (products) {
                 const order = new Order({
-                    orderId: generateId(16),
+                    orderId: generateRandomString(32),
                     phone,
                     products,
                     totalPrice: price,
@@ -163,7 +163,7 @@ module.exports.AddCustomOrder = async (req, res) => {
         const { phone, address, details, designs, price } = req.body
         if (phone && address && designs && price) {
             const order = await new Order({
-                orderId: generateId(16),
+                orderId: generateRandomString(32),
                 phone,
                 address,
                 products: [{
