@@ -22,13 +22,6 @@ mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connecti
 
 app.use(cors());
 
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', "*");
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
-
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(apiKeyMiddleware)
