@@ -16,7 +16,6 @@ require("dotenv/config")
 const app = express()
 
 const PORT = process.env.PORT
-const origins = JSON.parse(process.env.ORIGIN).origins
 
 
 mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connection successful..`)).catch(err => console.log(err))
