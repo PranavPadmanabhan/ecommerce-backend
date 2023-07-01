@@ -21,11 +21,7 @@ const origins = JSON.parse(process.env.ORIGIN).origins
 
 mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connection successful..`)).catch(err => console.log(err))
 
-app.use(cors(
-  {
-    origin: "*",
-  }
-));
+app.use(cors());
 
 // app.use((req, res, next) => {
 //   res.setHeader('Access-Control-Allow-Origin', process.env.ORIGIN);
