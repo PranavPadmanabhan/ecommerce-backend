@@ -16,23 +16,25 @@ require("dotenv/config")
 const app = express()
 
 const PORT = process.env.PORT
+const origins = JSON.parse(process.env.ORIGIN).origins
+
 
 mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connection successful..`)).catch(err => console.log(err))
 
 app.use(cors(
   {
-    origin: process.env.ORIGIN,
+    origin: origins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    // allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type']
   }
   ));
 
-  app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', process.env.ORIGIN);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-  });
+  // app.use((req, res, next) => {
+  //   res.setHeader('Access-Control-Allow-Origin', process.env.ORIGIN);
+  //   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  //   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  //   next();
+  // });
   
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
