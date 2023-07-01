@@ -1,3 +1,4 @@
+const Cart = require("../models/Cart.js");
 const Order = require("../models/Orders.js")
 const Product = require("../models/Product.js")
 require("dotenv").config()
@@ -35,6 +36,13 @@ module.exports.PlaceOrder = async (req, res) => {
 
                 }).save()
                 const orders = await Order.find({ phone })
+                const cart = await Cart.findOne({ phone });
+                cart.products = cart.products.filter(item => {
+                    for (let i = 0; i < products.length; i++) {
+                        return item.cartItemId !== products[i].cartItemId;
+                    }
+                })
+                await cart.save()
                 res.status(201).json({ message: "Order Placed SuccessFully", orders,order })
             }
             else {
@@ -176,6 +184,7 @@ module.exports.AddCustomOrder = async (req, res) => {
                     message: "delivered within 10 working days"
                 }
             }).save()
+            
             res.status(201).json(order)
         }
         else {
