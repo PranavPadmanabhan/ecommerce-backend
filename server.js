@@ -21,7 +21,7 @@ const PORT = process.env.PORT
 mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connection successful..`)).catch(err => console.log(err))
 
 const corsOptions = {
-    origin: 'https://inline-outfits.vercel.app', // Restrict access to a specific origin
+    origin: '*', // Restrict access to a specific origin
     methods: 'GET,PUT,POST,DELETE', // Specify allowed HTTP methods
     allowedHeaders: 'Content-Type,Authorization', // Specify allowed headers
     exposedHeaders: 'Content-Length,ETag', // Specify headers exposed to the client
