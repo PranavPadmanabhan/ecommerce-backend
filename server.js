@@ -20,9 +20,17 @@ const PORT = process.env.PORT
 
 mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connection successful..`)).catch(err => console.log(err))
 
-app.use(cors({
-    origin:"https://inline-outfits.vercel.app/"
-}));
+const corsOptions = {
+    origin: 'https://inline-outfits.vercel.app', // Restrict access to a specific origin
+    methods: 'GET,PUT,POST,DELETE', // Specify allowed HTTP methods
+    allowedHeaders: 'Content-Type,Authorization', // Specify allowed headers
+    exposedHeaders: 'Content-Length,ETag', // Specify headers exposed to the client
+    credentials: true, // Allow sending cookies from the client-side
+    preflightContinue: false, // Disable handling of preflight OPTIONS requests
+    optionsSuccessStatus: 204 // Set the response status for successful preflight requests
+  };
+
+app.use(cors(corsOptions));
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
