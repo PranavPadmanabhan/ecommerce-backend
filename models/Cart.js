@@ -2,15 +2,15 @@ const { Schema, model } = require('mongoose')
 const Product = require('./Product')
 
 const cartSchema = new Schema({
-    cartId:{ type:String, unique:true},
-    userId:{ type:String, unique:true},
+    cartId:{ type:String},
+    userId:{ type:String},
     phone:{ type: String, required:true, unique:true },
     products:{ type: [{
         productId:String,
-        cartItemId:{ type: String, required:true, unique:true },
+        cartItemId:{ type: String },
         product:{
             type:Object,
-            ref:Product,
+            ref:Product
         },
         quantity:Number,
         color:Object,

@@ -69,6 +69,7 @@ module.exports.SignUp = async (req, res, next) => {
 
 module.exports.SignIn = async (req, res) => {
     const { phone, password } = req.body
+    console.log(req.body)
     try {
         if (phone && password) {
             const user = await User.findOne({ phone }).select([
