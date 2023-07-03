@@ -25,18 +25,17 @@ app.use(cors());
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-app.use(apiKeyMiddleware)
 
 
-app.use("/auth", userRoute)
-app.use("/admin", adminUserRoute)
-app.use("/user", verifyUserRoute)
-app.use("/cart", cartRoute)
-app.use("/orders", orderRoute)
-app.use("/products", productRoute)
-app.use("/designs", designRoute)
-app.use("/patterns", patternRoute)
-app.use("/payment", paymentRoute)
+app.use("/auth",apiKeyMiddleware, userRoute)
+app.use("/admin",apiKeyMiddleware, adminUserRoute)
+app.use("/user",apiKeyMiddleware, verifyUserRoute)
+app.use("/cart",apiKeyMiddleware, cartRoute)
+app.use("/orders",apiKeyMiddleware, orderRoute)
+app.use("/products",apiKeyMiddleware, productRoute)
+app.use("/designs",apiKeyMiddleware, designRoute)
+app.use("/patterns",apiKeyMiddleware, patternRoute)
+app.use("/payment",apiKeyMiddleware, paymentRoute)
 
 app.get("/", (req, res) => res.send("hello"))
 
