@@ -52,7 +52,8 @@ module.exports.SignUp = async (req, res, next) => {
                                 "email",
                                 "phone",
                                 "profileImage",
-                                "VerifiedUser"
+                                "VerifiedUser",
+                                "addresses"
                             ]) })
                         }
                     });
@@ -69,7 +70,6 @@ module.exports.SignUp = async (req, res, next) => {
 
 module.exports.SignIn = async (req, res) => {
     const { phone, password } = req.body
-    console.log(req.body)
     try {
         if (phone && password) {
             const user = await User.findOne({ phone }).select([
@@ -78,7 +78,8 @@ module.exports.SignIn = async (req, res) => {
                 "email",
                 "phone",
                 "profileImage",
-                "VerifiedUser"
+                "VerifiedUser",
+                "addresses"
             ])
             if (user) {
                 bcrypt.compare(password, (await User.findOne({phone})).password, function (err, result) {
