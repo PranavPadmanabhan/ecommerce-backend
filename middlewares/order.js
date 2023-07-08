@@ -21,20 +21,21 @@ module.exports.PlaceOrder = async (req, res) => {
     const { phone, products, address, price } = req.body;
     try {
         if (phone && products && address && price) {
-            
             if (products) {
-                const order = new Order({
-                    orderId: generateRandomString(32),
-                    phone,
-                    products,
-                    totalPrice: price,
-                    status: "Order Placed",
-                    address,
-                    deliveryDetails: {
-                        message: "delivered within 10 working days"
-                    }
-
-                }).save()
+                for (let i = 0; i < products.length; i++) {
+                    const order = await new Order({
+                        orderId: generateRandomString(32),
+                        phone,
+                        product:products[i],
+                        totalPrice: parseInt(products[i].price) * parseInt(products[i].quantity),
+                        status: "Order Placed",
+                        address,
+                        deliveryDetails: {  
+                            message: "delivered within 10 working days"
+                        }
+                    }).save()
+                    
+                }
                 const orders = await Order.find({ phone })
                 const cart = await Cart.findOne({ phone });
                 cart.products = cart.products.filter(item => {
@@ -43,7 +44,7 @@ module.exports.PlaceOrder = async (req, res) => {
                     }
                 })
                 await cart.save()
-                res.status(201).json({ message: "Order Placed SuccessFully", orders,order })
+                res.status(201).json({ message: "Order Placed SuccessFully", orders })
             }
             else {
                 res.status(200).json({ error: "something went wrong!" })
@@ -155,7 +156,7 @@ module.exports.AdminOrders = async (req, res) => {
     try {
         const { phone } = req.params
         const orders = await Order.find({})
-        if (orders.length > 0 && admins.includes(phone)) {
+        if (admins.includes(phone)) {
             res.status(200).json(orders)
         }
         else {

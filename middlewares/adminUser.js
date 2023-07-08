@@ -1,19 +1,14 @@
-const AdminUser = require('../models/AdminUser.js')
+const User = require('../models/AdminUser.js')
 const bcrypt = require('bcrypt')
-const saltRounds = 10;
-require("dotenv").config()
 const { v4: uuidv4 } = require('uuid');
 const Cart = require('../models/Cart.js');
-const admins = JSON.parse(process.env.DATA).admins
+const saltRounds = 10;
 
 module.exports.SignUp = async (req, res, next) => {
     const { name, phone, password } = req.body
-   try {
-    if (name && phone && password) {
-        if (admins.includes(phone)) {
-
-            const user = await AdminUser.findOne({ phone })
-            const cart = await Cart.findOne({ phone })
+    try {
+        if (name && phone && password) {
+            const user = await User.findOne({ phone })
 
             if (user) {
                 res.status(200).json({ error: "user already exists!!" })
@@ -25,7 +20,7 @@ module.exports.SignUp = async (req, res, next) => {
                             res.status(200).json({ error: err })
                         }
                         else {
-                            const newUser = await new AdminUser({
+                            const newUser = await new User({
                                 userId:uuidv4(),
                                 name,
                                 phone,
@@ -33,42 +28,43 @@ module.exports.SignUp = async (req, res, next) => {
                                 addresses: [],
                                 VerifiedUser: false
                             }).save()
-                            if(!cart){
-                                const newCart = await new Cart({
-                                    cartId:uuidv4(),
-                                    phone,
-                                    products:[],
-                                    userId:newUser.userId
-                                }).save()
-                            }
-                            
-                            res.status(201).json({ message: "signup successful ", user: newUser })
+                            res.status(201).json({ message: "signup successful ", user: await User.findOne({ phone }).select([
+                                "userId",
+                                "name",
+                                "email",
+                                "phone",
+                                "profileImage",
+                                "VerifiedUser",
+                                "addresses"
+                            ]) })
                         }
                     });
                 });
             }
         }
         else {
-            res.status(200).json({ error: "UnAuthorized" })
+            res.status(200).json({ error: "fields missing!!" })
         }
+    } catch (error) {
+        
     }
-    else {
-        res.status(200).json({ error: "fields missing!!" })
-    }
-   } catch (error) {
-    
-   }
 }
-
 
 module.exports.SignIn = async (req, res) => {
     const { phone, password } = req.body
-  try {
-    if (phone && password) {
-        if (admins.includes(phone)) {
-            const user = await AdminUser.findOne({ phone })
+    try {
+        if (phone && password) {
+            const user = await User.findOne({ phone }).select([
+                "userId",
+                "name",
+                "email",
+                "phone",
+                "profileImage",
+                "VerifiedUser",
+                "addresses"
+            ])
             if (user) {
-                bcrypt.compare(password, user.password, function (err, result) {
+                bcrypt.compare(password, (await User.findOne({phone})).password, function (err, result) {
                     if (result === true) {
                         res.status(200).json({ message: "signin successfull", user })
                     }
@@ -79,20 +75,15 @@ module.exports.SignIn = async (req, res) => {
             }
             else {
                 res.status(200).json({ error: "user doesnot exist!!" })
-
+    
             }
         }
         else {
-            res.status(200).json({ error: "UnAuthorized" })
-
+            res.status(200).json({ error: "fields missing!!" })
         }
+    } catch (error) {
+        
     }
-    else {
-        res.status(200).json({ error: "fields missing!!" })
-    }
-  } catch (error) {
-    
-  }
 }
 
 module.exports.UpdateUser = async (req, res, next) => {
@@ -100,7 +91,15 @@ module.exports.UpdateUser = async (req, res, next) => {
     const { name, addresses, email, password, isVerified,profileImage } = req.body
     try {
         if (name || password || email || addresses || isVerified || profileImage) {
-            const user = await AdminUser.findOne({ phone })
+            const user = await User.findOne({ phone }).select([
+                "userId",
+                "name",
+                "email",
+                "phone",
+                "profileImage",
+                "VerifiedUser",
+                "addresses"
+            ])
             if (user) {
     
                 if (password) {
@@ -115,6 +114,7 @@ module.exports.UpdateUser = async (req, res, next) => {
                                 user.password = hash ?? user.password
                                 user.VerifiedUser = isVerified ?? user.VerifiedUser
                                 user.profileImage = profileImage ?? user.profileImage
+                                user.addresses = addresses ?? user.addresses
                                 const updated = await user.save()
                                 res.status(200).json({ message: "updated successfully", user: updated })
                             }
@@ -126,6 +126,7 @@ module.exports.UpdateUser = async (req, res, next) => {
                     user.email = email ?? user.email
                     user.VerifiedUser = isVerified ?? user.VerifiedUser
                     user.profileImage = profileImage ?? user.profileImage
+                    user.addresses = addresses ?? user.addresses
                     const updated = await user.save()
                     res.status(200).json({ message: "updated successfully", user: updated })
                 }
@@ -133,11 +134,33 @@ module.exports.UpdateUser = async (req, res, next) => {
             }
             else {
                 res.status(200).json({ error: "user doesnot exist!!" })
-    
             }
         }
         else {
             res.status(200).json({ error: "fields missing!!" })
+        }
+    } catch (error) {
+        
+    }
+}
+
+module.exports.GetUser = async(req,res) => {
+    try {
+        const { phone } = req.params;
+        const user = await User.findOne({ phone }).select([
+            "userId",
+            "name",
+            "email",
+            "phone",
+            "profileImage",
+            "VerifiedUser",
+            "addresses"
+        ])
+        if(user){
+            res.status(200).json(user)
+        }
+        else{
+            res.status(200).json({ error: "user not found!!"}) 
         }
     } catch (error) {
         
