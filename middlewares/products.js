@@ -5,13 +5,14 @@ const admins = JSON.parse(process.env.DATA).admins
 
 module.exports.AddProduct = async (req, res) => {
     try {
-        const { name, description, price, images, phone,details,colors } = req.body
-        if (name && description && price && images  &&  admins.includes(phone)) {
+        const { name, description, price, images, phone,details,colors,sizes } = req.body
+        if (name && description && price && images&&sizes && colors  &&  admins.includes(phone)) {
             const product = await new Product({
                 productId: uuidv4(),
                 name,
                 description,
                 images,
+                sizes,
                 colors:colors??null,
                 details:details??null,
                 price
