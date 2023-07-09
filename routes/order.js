@@ -1,10 +1,11 @@
 const { Router } = require('express')
-const { GetOrders, PlaceOrder, CancelOrder, UpdateOrder, UpdateOrderAdminOnly, AdminOrders, AddCustomOrder } = require('../middlewares/order.js')
+const { GetOrders, PlaceOrder, CancelOrder, UpdateOrder, UpdateOrderAdminOnly, AdminOrders, AddCustomOrder, GetOrder } = require('../middlewares/order.js')
 
 
 const router = Router()
 
 router.get("/:phone",GetOrders)
+router.get("/admin/:phone/:orderId",GetOrder)
 router.post("/",PlaceOrder)
 router.post("/custom",AddCustomOrder)
 router.delete("/cancel",CancelOrder)

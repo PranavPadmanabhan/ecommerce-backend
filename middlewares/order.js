@@ -27,14 +27,21 @@ module.exports.PlaceOrder = async (req, res) => {
                         orderId: generateRandomString(32),
                         phone,
                         product:products[i],
-                        totalPrice: parseInt(products[i].price) * parseInt(products[i].quantity),
+                        totalPrice: parseInt(products[i].product.price) * parseInt(products[i].quantity),
                         status: "Order Placed",
-                        address,
+                        address:{
+                            Name:address.name,
+                            Address:address.address,
+                            CityorDistrict:address.city,
+                            Landmark:address.landMark,
+                            Phone:address.phone,
+                            PinCode:address.pinCode,
+                            State:address.state  
+                        },
                         deliveryDetails: {  
                             message: "delivered within 10 working days"
                         }
-                    }).save()
-                    
+                    }).save()   
                 }
                 const orders = await Order.find({ phone })
                 const cart = await Cart.findOne({ phone });
@@ -65,6 +72,26 @@ module.exports.GetOrders = async (req, res) => {
             const orders = await Order.find({ phone })
             if (orders) {
                 res.status(200).json(orders)
+            }
+            else {
+                res.status(200).json({ error: "something went wrong!" })
+            }
+        }
+        else {
+            res.status(200).json({ error: "Fields are missing" })
+        }
+    } catch (error) {
+
+    }
+}
+
+module.exports.GetOrder = async (req, res) => {
+    const { phone,orderId } = req.params;
+    try {
+        if (phone && orderId && admins.includes(phone)) {
+            const order = await Order.findOne({ orderId })
+            if (order) {
+                res.status(200).json(order)
             }
             else {
                 res.status(200).json({ error: "something went wrong!" })
@@ -154,6 +181,7 @@ module.exports.UpdateOrderAdminOnly = async (req, res) => {
 
 module.exports.AdminOrders = async (req, res) => {
     try {
+        
         const { phone } = req.params
         const orders = await Order.find({})
         if (admins.includes(phone)) {
