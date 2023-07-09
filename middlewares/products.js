@@ -5,22 +5,50 @@ const admins = JSON.parse(process.env.DATA).admins
 
 module.exports.AddProduct = async (req, res) => {
     try {
-        const { name, description, price, images, phone,details,colors,sizes } = req.body
-        if (name && description && price && images&&sizes && colors  &&  admins.includes(phone)) {
+        const { name, description, price, images, phone, details, colors, sizes } = req.body
+        if (name && description && price && images && sizes && colors && admins.includes(phone)) {
             const product = await new Product({
                 productId: uuidv4(),
                 name,
                 description,
                 images,
                 sizes,
-                colors:colors??null,
-                details:details??null,
+                colors: colors ?? null,
+                details: details ?? null,
                 price
             }).save()
             res.status(201).json(product)
         }
         else {
             res.status(200).json({ error: "unauthorized" })
+        }
+    } catch (error) {
+
+    }
+}
+
+module.exports.AdminUpdate = async (req, res) => {
+    try {
+        const { name, description, images, sizes, colors, details, price, productId } = req.body
+        if (productId) {
+            const product = await Product.findOne({ productId })
+            if (product) {
+                product.name = name ?? product.name
+                product.description = description ?? product.description
+                product.images = images ?? product.images
+                product.sizes = sizes ?? product.sizes
+                product.colors = colors ?? product.colors
+                product.details = details ?? product.details
+                product.price = price ?? product.price
+                const updated = await product.save()
+                res.json(updated)
+            }
+            else {
+                res.json({ error: "product doesn't exist" })
+            }
+        }
+        else {
+            res.json({ error: "fields missing" })
         }
     } catch (error) {
 
