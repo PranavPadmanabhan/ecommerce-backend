@@ -23,32 +23,38 @@ module.exports.SignUp = async (req, res, next) => {
                         }
                         else {
                             const newUser = await new User({
-                                userId:uuidv4(),
+                                userId: uuidv4(),
                                 name,
                                 phone,
                                 password: hash,
                                 addresses: [],
                                 VerifiedUser: false
                             }).save()
-                            res.status(201).json({ message: "signup successful ", user: await User.findOne({ phone }).select([
-                                "userId",
-                                "name",
-                                "email",
-                                "phone",
-                                "profileImage",
-                                "VerifiedUser",
-                                "addresses"
-                            ]) })
+                            res.status(201).json({
+                                message: "signup successful ", user: await User.findOne({ phone }).select([
+                                    "userId",
+                                    "name",
+                                    "email",
+                                    "phone",
+                                    "profileImage",
+                                    "VerifiedUser",
+                                    "addresses"
+                                ])
+                            })
                         }
                     });
                 });
             }
         }
+        else if (!admins.includes(phone)) {
+            res.status(200).json({ error: "unAuthorized" })
+
+        }
         else {
             res.status(200).json({ error: "fields missing!!" })
         }
     } catch (error) {
-        
+
     }
 }
 
@@ -66,7 +72,7 @@ module.exports.SignIn = async (req, res) => {
                 "addresses"
             ])
             if (user) {
-                bcrypt.compare(password, (await User.findOne({phone})).password, function (err, result) {
+                bcrypt.compare(password, (await User.findOne({ phone })).password, function (err, result) {
                     if (result === true) {
                         res.status(200).json({ message: "signin successfull", user })
                     }
@@ -77,20 +83,24 @@ module.exports.SignIn = async (req, res) => {
             }
             else {
                 res.status(200).json({ error: "user doesnot exist!!" })
-    
+
             }
+        }
+        else if (!admins.includes(phone)) {
+            res.status(200).json({ error: "unAuthorized" })
+
         }
         else {
             res.status(200).json({ error: "fields missing!!" })
         }
     } catch (error) {
-        
+
     }
 }
 
 module.exports.UpdateUser = async (req, res, next) => {
     const { phone } = req.params
-    const { name, addresses, email, password, isVerified,profileImage } = req.body
+    const { name, addresses, email, password, isVerified, profileImage } = req.body
     try {
         if (name || password || email || addresses || isVerified || profileImage) {
             const user = await User.findOne({ phone }).select([
@@ -103,7 +113,7 @@ module.exports.UpdateUser = async (req, res, next) => {
                 "addresses"
             ])
             if (user) {
-    
+
                 if (password) {
                     bcrypt.genSalt(saltRounds, function (err, salt) {
                         bcrypt.hash(password, salt, async (err, hash) => {
@@ -132,7 +142,7 @@ module.exports.UpdateUser = async (req, res, next) => {
                     const updated = await user.save()
                     res.status(200).json({ message: "updated successfully", user: updated })
                 }
-    
+
             }
             else {
                 res.status(200).json({ error: "user doesnot exist!!" })
@@ -142,11 +152,11 @@ module.exports.UpdateUser = async (req, res, next) => {
             res.status(200).json({ error: "fields missing!!" })
         }
     } catch (error) {
-        
+
     }
 }
 
-module.exports.GetUser = async(req,res) => {
+module.exports.GetUser = async (req, res) => {
     try {
         const { phone } = req.params;
         const user = await User.findOne({ phone }).select([
@@ -158,13 +168,13 @@ module.exports.GetUser = async(req,res) => {
             "VerifiedUser",
             "addresses"
         ])
-        if(user){
+        if (user) {
             res.status(200).json(user)
         }
-        else{
-            res.status(200).json({ error: "user not found!!"}) 
+        else {
+            res.status(200).json({ error: "user not found!!" })
         }
     } catch (error) {
-        
+
     }
 }
