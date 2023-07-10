@@ -3,11 +3,13 @@ const bcrypt = require('bcrypt')
 const { v4: uuidv4 } = require('uuid');
 const Cart = require('../models/Cart.js');
 const saltRounds = 10;
+require("dotenv").config()
+const admins = JSON.parse(process.env.DATA).admins
 
 module.exports.SignUp = async (req, res, next) => {
     const { name, phone, password } = req.body
     try {
-        if (name && phone && password) {
+        if (name && phone && password && admins.includes(phone)) {
             const user = await User.findOne({ phone })
 
             if (user) {
@@ -53,7 +55,7 @@ module.exports.SignUp = async (req, res, next) => {
 module.exports.SignIn = async (req, res) => {
     const { phone, password } = req.body
     try {
-        if (phone && password) {
+        if (phone && password && admins && admins.includes(phone)) {
             const user = await User.findOne({ phone }).select([
                 "userId",
                 "name",
