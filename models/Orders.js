@@ -1,9 +1,10 @@
 const { Schema, model } = require('mongoose')
+const Product = require('./Product')
 
 const orderSchema = new Schema({
     orderId: { type: String, unique: true },
     phone: { type: String },
-    product: { type: Object },
+    product: { type: Object, ref: Product },
     totalPrice: String,
     address: {
         type: {

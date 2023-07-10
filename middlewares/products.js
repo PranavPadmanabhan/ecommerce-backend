@@ -1,3 +1,5 @@
+const Cart = require("../models/Cart.js");
+const Orders = require("../models/Orders.js");
 const Product = require("../models/Product.js")
 const { v4: uuidv4 } = require('uuid');
 require("dotenv").config()
@@ -40,8 +42,26 @@ module.exports.AdminUpdate = async (req, res) => {
                 product.colors = colors ?? product.colors
                 product.details = details ?? product.details
                 product.price = price ?? product.price
-                const updated = await product.save()
-                res.json(updated)
+                await product.save()
+                await Cart.find({}).then(async (data) => {
+                    for (let i = 0; i < data.length; i++) {
+                        data[i].products = data[i].products.map(item => item.productId === productId ? {
+                            ...item,
+                            product: {
+                                name: name ?? product.name,
+                                description: description ?? product.description,
+                                images: images ?? product.images,
+                                sizes: sizes ?? product.sizes,
+                                colors: colors ?? product.colors,
+                                details: details ?? product.details,
+                                price: price ?? product.price,
+                            }
+                        } : item)
+                        await data[i].save()
+                    }
+                })
+                res.json({ message: "updated" })
+
             }
             else {
                 res.json({ error: "product doesn't exist" })

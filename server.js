@@ -11,6 +11,8 @@ const designRoute = require('./routes/designs.js')
 const patternRoute = require('./routes/patterns.js')
 const paymentRoute = require('./routes/payment.js')
 const { apiKeyMiddleware } = require('./utils/helper-functions.js')
+const Product = require('./models/Product.js')
+const Cart = require('./models/Cart.js')
 require("dotenv/config")
 
 const app = express()
@@ -45,3 +47,15 @@ app.listen(PORT, () => console.log(`app running at http://localhost:${PORT}`))
 // users can create their own customized t shirts and they will get  5% of its price if anyone buys that design
 
 
+// const stream = Product.watch()
+
+// stream.on("change",async(change) => {
+//     // console.log(change)
+//     if(change.operationType === "update"){
+//         const product = await Product.findById(change.documentKey)
+//         if(product){
+//             const cart = await Cart.find({"_id":change.documentKey})
+//             console.log(cart)
+//         }
+//     }
+// })
