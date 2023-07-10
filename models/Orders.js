@@ -20,9 +20,8 @@ const orderSchema = new Schema({
     },
     status: String,
     deliveryDetails: { type: Object },
-    paymentDetails: { type: Object }
-},{
-    timestamps:true
+    paymentDetails: { type: Object },
+    createdAt:Number
 })
 
 module.exports = model("Order", orderSchema)

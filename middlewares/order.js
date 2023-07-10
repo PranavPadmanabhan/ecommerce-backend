@@ -7,15 +7,15 @@ const admins = JSON.parse(process.env.DATA).admins
 function generateRandomString(length) {
     let result = '';
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  
+
     for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      result += characters.charAt(randomIndex);
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        result += characters.charAt(randomIndex);
     }
-  
+
     return result;
-  }
-  
+}
+
 
 module.exports.PlaceOrder = async (req, res) => {
     const { phone, products, address, price } = req.body;
@@ -26,22 +26,23 @@ module.exports.PlaceOrder = async (req, res) => {
                     const order = await new Order({
                         orderId: generateRandomString(32),
                         phone,
-                        product:products[i],
+                        product: products[i],
                         totalPrice: parseInt(products[i].product.price) * parseInt(products[i].quantity),
                         status: "Order Placed",
-                        address:{
-                            Name:address.name,
-                            Address:address.address,
-                            CityorDistrict:address.city,
-                            Landmark:address.landMark,
-                            Phone:address.phone,
-                            PinCode:address.pinCode,
-                            State:address.state  
+                        address: {
+                            Name: address.name,
+                            Address: address.address,
+                            CityorDistrict: address.city,
+                            Landmark: address.landMark,
+                            Phone: address.phone,
+                            PinCode: address.pinCode,
+                            State: address.state
                         },
-                        deliveryDetails: {  
+                        deliveryDetails: {
                             message: "delivered within 10 working days"
-                        }
-                    }).save()   
+                        },
+                        createdAt: new Date().getTime()
+                    }).save()
                 }
                 const orders = await Order.find({ phone })
                 const cart = await Cart.findOne({ phone });
@@ -86,7 +87,7 @@ module.exports.GetOrders = async (req, res) => {
 }
 
 module.exports.GetOrder = async (req, res) => {
-    const { phone,orderId } = req.params;
+    const { phone, orderId } = req.params;
     try {
         if (phone && orderId && admins.includes(phone)) {
             const order = await Order.findOne({ orderId })
@@ -181,7 +182,7 @@ module.exports.UpdateOrderAdminOnly = async (req, res) => {
 
 module.exports.AdminOrders = async (req, res) => {
     try {
-        
+
         const { phone } = req.params
         const orders = await Order.find({})
         if (admins.includes(phone)) {
@@ -211,9 +212,11 @@ module.exports.AddCustomOrder = async (req, res) => {
                 status: "Order Placed",
                 deliveryDetails: {
                     message: "delivered within 10 working days"
-                }
+                },
+                createdAt: new Date().getTime()
+
             }).save()
-            
+
             res.status(201).json(order)
         }
         else {
