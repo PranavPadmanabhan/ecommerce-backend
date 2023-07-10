@@ -21,6 +21,8 @@ const orderSchema = new Schema({
     status: String,
     deliveryDetails: { type: Object },
     paymentDetails: { type: Object }
+},{
+    timestamps:true
 })
 
 module.exports = model("Order", orderSchema)
