@@ -6,7 +6,7 @@ const router = Router()
 
 router.get("/:phone", GetOrders)
 router.get("/admin/:phone/:orderId", GetAdminOrder)
-router.get("/:orderId", GetOrder)
+router.get("/order/:orderId", GetOrder)
 router.post("/", PlaceOrder)
 router.post("/custom", AddCustomOrder)
 router.delete("/cancel", CancelOrder)
