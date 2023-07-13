@@ -22,39 +22,41 @@ module.exports.SignUp = async (req, res, next) => {
                         }
                         else {
                             const newUser = await new User({
-                                userId:uuidv4(),
+                                userId: uuidv4(),
                                 name,
                                 phone,
                                 password: hash,
                                 addresses: [],
                                 VerifiedUser: false
                             }).save()
-                            if(cart){
+                            if (cart) {
                                 await Cart.findOneAndDelete({ phone })
                                 const newCart = await new Cart({
-                                    cartId:uuidv4(),
+                                    cartId: uuidv4(),
                                     phone,
-                                    products:[],
-                                    userId:newUser.userId
+                                    products: [],
+                                    userId: newUser.userId
                                 }).save()
                             }
                             else {
                                 const newCart = await new Cart({
-                                    cartId:uuidv4(),
+                                    cartId: uuidv4(),
                                     phone,
-                                    products:[],
-                                    userId:newUser.userId
+                                    products: [],
+                                    userId: newUser.userId
                                 }).save()
                             }
-                            res.status(201).json({ message: "signup successful ", user: await User.findOne({ phone }).select([
-                                "userId",
-                                "name",
-                                "email",
-                                "phone",
-                                "profileImage",
-                                "VerifiedUser",
-                                "addresses"
-                            ]) })
+                            res.status(201).json({
+                                message: "signup successful ", user: await User.findOne({ phone }).select([
+                                    "userId",
+                                    "name",
+                                    "email",
+                                    "phone",
+                                    "profileImage",
+                                    "VerifiedUser",
+                                    "addresses"
+                                ])
+                            })
                         }
                     });
                 });
@@ -64,7 +66,7 @@ module.exports.SignUp = async (req, res, next) => {
             res.status(200).json({ error: "fields missing!!" })
         }
     } catch (error) {
-        
+
     }
 }
 
@@ -82,7 +84,7 @@ module.exports.SignIn = async (req, res) => {
                 "addresses"
             ])
             if (user) {
-                bcrypt.compare(password, (await User.findOne({phone})).password, function (err, result) {
+                bcrypt.compare(password, (await User.findOne({ phone })).password, function (err, result) {
                     if (result === true) {
                         res.status(200).json({ message: "signin successfull", user })
                     }
@@ -93,20 +95,20 @@ module.exports.SignIn = async (req, res) => {
             }
             else {
                 res.status(200).json({ error: "user doesnot exist!!" })
-    
+
             }
         }
         else {
             res.status(200).json({ error: "fields missing!!" })
         }
     } catch (error) {
-        
+
     }
 }
 
 module.exports.UpdateUser = async (req, res, next) => {
     const { phone } = req.params
-    const { name, addresses, email, password, isVerified,profileImage } = req.body
+    const { name, addresses, email, password, isVerified, profileImage } = req.body
     try {
         if (name || password || email || addresses || isVerified || profileImage) {
             const user = await User.findOne({ phone }).select([
@@ -119,7 +121,7 @@ module.exports.UpdateUser = async (req, res, next) => {
                 "addresses"
             ])
             if (user) {
-    
+
                 if (password) {
                     bcrypt.genSalt(saltRounds, function (err, salt) {
                         bcrypt.hash(password, salt, async (err, hash) => {
@@ -148,7 +150,7 @@ module.exports.UpdateUser = async (req, res, next) => {
                     const updated = await user.save()
                     res.status(200).json({ message: "updated successfully", user: updated })
                 }
-    
+
             }
             else {
                 res.status(200).json({ error: "user doesnot exist!!" })
@@ -158,11 +160,11 @@ module.exports.UpdateUser = async (req, res, next) => {
             res.status(200).json({ error: "fields missing!!" })
         }
     } catch (error) {
-        
+
     }
 }
 
-module.exports.GetUser = async(req,res) => {
+module.exports.GetUser = async (req, res) => {
     try {
         const { phone } = req.params;
         const user = await User.findOne({ phone }).select([
@@ -174,13 +176,68 @@ module.exports.GetUser = async(req,res) => {
             "VerifiedUser",
             "addresses"
         ])
-        if(user){
+        if (user) {
             res.status(200).json(user)
         }
-        else{
-            res.status(200).json({ error: "user not found!!"}) 
+        else {
+            res.status(200).json({ error: "user not found!!" })
         }
     } catch (error) {
-        
+
+    }
+}
+
+module.exports.RemoveAddress = async (req, res) => {
+    const { phone } = req.params
+    const { addressId } = req.body;
+    try {
+        const user = await User.findOne({ phone })
+        if (user) {
+            await User.updateOne({ phone }, {
+                $set:{
+                    addresses:user?.addresses?.filter(item => item.addressId !== addressId)
+                }
+            })
+            res.status(200).json({ message: "successful" })
+        }
+        else {
+            res.status(200).json({ error: "user not found " })
+        }
+    } catch (error) {
+
+    }
+}
+
+module.exports.AddAddress = async (req, res) => {
+    const { phone } = req.params
+    const { address } = req.body;
+    try {
+        const newAddress = {
+            addressId: uuidv4(),
+            name: address.name,
+            phone: address.phone,
+            locality: address.locality,
+            pinCode: address.pinCode,
+            address: address.address,
+            city: address.city,
+            state: address.state,
+            landMark: address.landMark,
+            alternateNumber: address.alternateNumber,
+            isHomeAddress: address.isHomeAddress
+        }
+        const user = await User.findOne({ phone })
+        if (user) {
+            await User.updateOne({ phone }, {
+                $push: {
+                    addresses: newAddress
+                }
+            })
+            res.status(200).json({ message: "successful" })
+        }
+        else {
+            res.status(200).json({ error: "user not found " })
+        }
+    } catch (error) {
+
     }
 }
