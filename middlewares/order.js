@@ -86,10 +86,30 @@ module.exports.GetOrders = async (req, res) => {
     }
 }
 
-module.exports.GetOrder = async (req, res) => {
+module.exports.GetAdminOrder = async (req, res) => {
     const { phone, orderId } = req.params;
     try {
         if (phone && orderId && admins.includes(phone)) {
+            const order = await Order.findOne({ orderId })
+            if (order) {
+                res.status(200).json(order)
+            }
+            else {
+                res.status(200).json({ error: "something went wrong!" })
+            }
+        }
+        else {
+            res.status(200).json({ error: "Fields are missing" })
+        }
+    } catch (error) {
+
+    }
+}
+
+module.exports.GetOrder = async (req, res) => {
+    const { orderId } = req.params;
+    try {
+        if (orderId) {
             const order = await Order.findOne({ orderId })
             if (order) {
                 res.status(200).json(order)
