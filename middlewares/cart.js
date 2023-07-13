@@ -27,20 +27,20 @@ module.exports.AddToCart = async (req, res) => {
             if (prod && cart) {
                 const filtered = cart.products.filter((item) => (item.productId === productId && item.color.code == color.code && item.size === size))
                 if (filtered.length > 0) {
-                    cart.products = cart.products.map(item => (item.productId === productId && item.color.code == color.code && item.size === size)? { ...item, quantity: item.quantity + quantity } : item);
+                    cart.products = cart.products.map(item => (item.productId === productId && item.color.code == color.code && item.size === size) ? { ...item, quantity: item.quantity + quantity } : item);
                     const updated = await cart.save()
                     res.status(201).json({ product: filtered[0] })
                 }
                 else {
                     const product = {
-                        cartItemId:uuidv4(),
+                        cartItemId: uuidv4(),
                         productId: productId,
                         color,
                         product: prod,
                         quantity,
                         size
                     }
-                    cart.products = [...cart.products,product ]
+                    cart.products = [...cart.products, product]
                     const updated = await cart.save()
                     res.status(201).json({ product })
                 }
@@ -59,11 +59,10 @@ module.exports.AddToCart = async (req, res) => {
 
 module.exports.RemoveQuantityFromCart = async (req, res) => {
     try {
-        const { productId,cartItemId, phone, color, size, quantity } = req.body;
+        const { productId, cartItemId, phone, color, size, quantity } = req.body;
         if (productId && phone) {
-            const prod = await Product.findOne({ productId })
             const cart = await Cart.findOne({ phone })
-            if (prod && cart) {
+            if (cart) {
                 const filtered = cart.products.filter((item) => item.cartItemId === cartItemId)
                 if (filtered.length > 0 && quantity > 0) {
                     cart.products = cart.products.map(item => item.cartItemId === cartItemId ? { ...item, quantity } : item);
@@ -91,11 +90,10 @@ module.exports.RemoveQuantityFromCart = async (req, res) => {
 
 module.exports.RemoveProductFromCart = async (req, res) => {
     try {
-        const { cartItemId,productId, phone } = req.body;
+        const { cartItemId, productId, phone } = req.body;
         if (productId && phone) {
-            const prod = await Product.findOne({ productId })
             const cart = await Cart.findOne({ phone })
-            if (prod && cart) {
+            if (cart) {
 
                 cart.products = cart.products.filter(item => item.cartItemId !== cartItemId)
                 const updated = await cart.save()
