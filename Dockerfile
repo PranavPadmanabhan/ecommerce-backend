@@ -1,21 +1,22 @@
-# Use Node.js 18 LTS as base image
 FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json package-lock.json* ./
 
 # Install dependencies
 RUN npm ci --only=production
 
-# Copy application code
+# Copy application files
 COPY . .
 
-# Expose the port the app runs on
+# Expose port
 EXPOSE 3000
 
-# Start the application
-CMD ["node", "server.js"]
+# Set environment
+ENV NODE_ENV=production
+
+# Start application
+CMD ["npm", "start"]
 
