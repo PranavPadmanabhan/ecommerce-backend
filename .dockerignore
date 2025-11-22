@@ -15,4 +15,5 @@ coverage
 docker-compose*.yml
 Dockerfile.dev
 build_cmd_*.sh
-
+*.md
+!.dockerignore
