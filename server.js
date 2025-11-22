@@ -17,27 +17,10 @@ require("dotenv/config")
 
 const app = express()
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT
 
-// MongoDB connection with better error handling
-const connectDB = async () => {
-  try {
-    if (!process.env.MONGO_URI) {
-      throw new Error('MONGO_URI environment variable is not set')
-    }
-    await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-    })
-    console.log('MongoDB connection successful..')
-  } catch (err) {
-    console.error('MongoDB connection error:', err.message)
-    // In production, you might want to exit the process
-    // process.exit(1)
-  }
-}
 
-connectDB()
+mongoose.connect(process.env.MONGO_URI).then(() => console.log(`mongoDb connection successful..`)).catch(err => console.log(err))
 
 
 app.use(cors());
@@ -56,45 +39,10 @@ app.use("/designs",apiKeyMiddleware, designRoute)
 app.use("/patterns",apiKeyMiddleware, patternRoute)
 app.use("/payment",apiKeyMiddleware, paymentRoute)
 
-// Health check endpoint for load balancers and monitoring
-app.get("/health", (req, res) => {
-  res.status(200).json({ 
-    status: "ok", 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    database: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
-  })
-})
-
 app.get("/", (req, res) => res.send("hello"))
 
-// Start server
-const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log(`App running at http://0.0.0.0:${PORT}`)
-})
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received: closing HTTP server')
-  server.close(() => {
-    console.log('HTTP server closed')
-    mongoose.connection.close(false, () => {
-      console.log('MongoDB connection closed')
-      process.exit(0)
-    })
-  })
-})
-
-process.on('SIGINT', () => {
-  console.log('SIGINT signal received: closing HTTP server')
-  server.close(() => {
-    console.log('HTTP server closed')
-    mongoose.connection.close(false, () => {
-      console.log('MongoDB connection closed')
-      process.exit(0)
-    })
-  })
-})
+app.listen(PORT, () => console.log(`app running at http://localhost:${PORT}`))
 
 // users can create their own customized t shirts and they will get  5% of its price if anyone buys that design
 
